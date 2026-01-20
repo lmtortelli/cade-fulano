@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Banco de Dados PostgreSQL
+  postgres:
+    image: postgres:16-alpine
+    container_name: feriaspro-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ferias
+      POSTGRES_PASSWORD: ferias123
+      POSTGRES_DB: feriaspro
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ferias -d feriaspro"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Aplicação Next.js
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: feriaspro-app
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://ferias:ferias123@postgres:5432/feriaspro?schema=public
+      NEXT_PUBLIC_APP_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+
+  # PgAdmin para administração do banco (opcional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: feriaspro-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@feriaspro.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    profiles:
+      - tools
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: feriaspro-network

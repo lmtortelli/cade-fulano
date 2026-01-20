@@ -1,0 +1,172 @@
+// ============================================
+// Schema do Banco de Dados - FériasPro
+// Preparado para migração para backend separado
+// ============================================
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x", "linux-musl-openssl-3.0.x", "linux-arm64-openssl-3.0.x", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// DEPARTAMENTO
+// Agrupa colaboradores e define limites
+// ============================================
+model Departamento {
+  id              String        @id @default(cuid())
+  nome            String        @unique
+  sigla           String?       @db.VarChar(10)
+  limiteAusencias Int           @default(2) // Máx. pessoas de férias simultâneas
+  ativo           Boolean       @default(true)
+  colaboradores   Colaborador[]
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@map("departamentos")
+}
+
+// ============================================
+// COLABORADOR
+// Dados do funcionário
+// ============================================
+model Colaborador {
+  id                  String              @id @default(cuid())
+  nome                String
+  email               String              @unique
+  matricula           String?             @unique
+  cargo               String?
+  dataAdmissao        DateTime
+  ativo               Boolean             @default(true)
+  avatarUrl           String?
+  departamentoId      String
+  departamento        Departamento        @relation(fields: [departamentoId], references: [id])
+  periodosAquisitivos PeriodoAquisitivo[]
+  folgas              Folga[]
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+
+  @@index([departamentoId])
+  @@index([dataAdmissao])
+  @@map("colaboradores")
+}
+
+// ============================================
+// PERÍODO AQUISITIVO
+// Cada ano de trabalho gera um período
+// ============================================
+model PeriodoAquisitivo {
+  id                   String              @id @default(cuid())
+  colaboradorId        String
+  colaborador          Colaborador         @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+  numeroPeriodo        Int // 1º, 2º, 3º...
+  dataInicioAquisitivo DateTime
+  dataFimAquisitivo    DateTime
+  dataLimiteGozo       DateTime // 12 meses após fim aquisitivo
+  diasDireito          Int                 @default(30)
+  diasVendidos         Int                 @default(0) // Abono pecuniário (máx 10)
+  status               StatusPeriodo       @default(ATIVO)
+  ignorado             Boolean             @default(false) // Período ignorado pelo usuário
+  observacoes          String?
+  solicitacoes         SolicitacaoFerias[]
+  createdAt            DateTime            @default(now())
+  updatedAt            DateTime            @updatedAt
+
+  @@unique([colaboradorId, numeroPeriodo])
+  @@index([colaboradorId])
+  @@index([status])
+  @@index([dataLimiteGozo])
+  @@map("periodos_aquisitivos")
+}
+
+// ============================================
+// SOLICITAÇÃO DE FÉRIAS
+// Pedido de gozo ou venda de férias
+// ============================================
+model SolicitacaoFerias {
+  id                  String            @id @default(cuid())
+  periodoAquisitivoId String
+  periodoAquisitivo   PeriodoAquisitivo @relation(fields: [periodoAquisitivoId], references: [id], onDelete: Cascade)
+  dataInicioGozo      DateTime
+  dataFimGozo         DateTime
+  diasGozo            Int
+  tipo                TipoSolicitacao   @default(GOZO)
+  status              StatusSolicitacao @default(PENDENTE)
+  observacoes         String?
+  motivoRejeicao      String?
+  motivoCancelamento  String?
+  aprovadoPor         String?
+  aprovadoEm          DateTime?
+  canceladoEm         DateTime?
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
+
+  @@index([periodoAquisitivoId])
+  @@index([status])
+  @@index([dataInicioGozo])
+  @@index([dataFimGozo])
+  @@map("solicitacoes_ferias")
+}
+
+// ============================================
+// FOLGA
+// Registro de folgas (feriados, compensações, etc)
+// ============================================
+model Folga {
+  id            String         @id @default(cuid())
+  colaboradorId String
+  colaborador   Colaborador    @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
+  data          DateTime
+  tipo          TipoFolga
+  descricao     String?
+  status        StatusFolga    @default(APROVADO)
+  motivoRejeicao String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@index([colaboradorId])
+  @@index([data])
+  @@index([status])
+  @@map("folgas")
+}
+
+enum StatusFolga {
+  PENDENTE
+  APROVADO
+  REJEITADO
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum TipoFolga {
+  FERIADO // Feriado nacional/local
+  COMPENSACAO // Banco de horas/compensação
+  ABONO // Abono do empregador
+  LICENCA // Licença (médica, etc)
+  CARGO_CONFIANCA // Cargo de confiança
+  OUTRO // Outros tipos
+}
+
+enum StatusPeriodo {
+  ATIVO // Período em andamento ou disponível para uso
+  QUITADO // Todos os dias foram utilizados
+  VENCIDO // Passou do prazo limite de gozo
+}
+
+enum StatusSolicitacao {
+  PENDENTE // Aguardando aprovação
+  APROVADO // Aprovado pelo gestor
+  REJEITADO // Rejeitado
+  CANCELADO // Cancelado pelo colaborador
+}
+
+enum TipoSolicitacao {
+  GOZO // Gozo de férias (descanso)
+  ABONO_PECUNIARIO // Venda de dias (máx 10)
+}
