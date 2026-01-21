@@ -34,7 +34,8 @@ interface Folga {
   colaboradorNome: string
   departamento: string
   departamentoId: string
-  data: string
+  dataInicio: string
+  dataFim: string | null
   tipo: string
   descricao: string | null
 }
@@ -242,7 +243,8 @@ export default function CronogramaPage() {
           colaboradorNome: f.colaborador.nome,
           departamento: f.colaborador.departamento.nome,
           departamentoId: f.colaborador.departamento.id,
-          data: f.data,
+          dataInicio: f.dataInicio,
+          dataFim: f.dataFim,
           tipo: f.tipo,
           descricao: f.descricao
         }))
@@ -367,11 +369,12 @@ export default function CronogramaPage() {
     const tipoLabel = TIPOS_FOLGA[f.tipo]?.label || f.tipo
     const title = `Folga (${tipoLabel}) - ${f.colaboradorNome}`
     const description = `Tipo: ${tipoLabel}\nDepartamento: ${f.departamento}${f.descricao ? `\nDescrição: ${f.descricao}` : ''}`
-    const folgaDate = parseLocalDate(f.data)
+    const folgaInicio = parseLocalDate(f.dataInicio)
+    const folgaFim = f.dataFim ? parseLocalDate(f.dataFim) : folgaInicio
     const url = generateGoogleCalendarUrl(
       title,
-      folgaDate,
-      folgaDate,
+      folgaInicio,
+      folgaFim,
       description
     )
     window.open(url, '_blank')
@@ -400,11 +403,12 @@ export default function CronogramaPage() {
     // Adicionar folgas
     folgasFiltradas.forEach(f => {
       const tipoLabel = TIPOS_FOLGA[f.tipo]?.label || f.tipo
-      const folgaDate = parseLocalDate(f.data)
+      const folgaInicio = parseLocalDate(f.dataInicio)
+      const folgaFim = f.dataFim ? parseLocalDate(f.dataFim) : folgaInicio
       events.push({
         title: `Folga (${tipoLabel}) - ${f.colaboradorNome}`,
-        startDate: folgaDate,
-        endDate: folgaDate,
+        startDate: folgaInicio,
+        endDate: folgaFim,
         description: `Tipo: ${tipoLabel}\nDepartamento: ${f.departamento}${f.descricao ? `\nDescrição: ${f.descricao}` : ''}`,
         uid: `folga-${f.id}`
       })
@@ -433,8 +437,16 @@ export default function CronogramaPage() {
   const getFolgasForDay = (day: Date) => {
     const dayStr = format(day, 'yyyy-MM-dd')
     return folgasFiltradas.filter(f => {
-      const folgaDate = format(parseLocalDate(f.data), 'yyyy-MM-dd')
-      return folgaDate === dayStr
+      const folgaInicio = format(parseLocalDate(f.dataInicio), 'yyyy-MM-dd')
+      
+      // Se não tem dataFim, é uma folga de um dia só
+      if (!f.dataFim) {
+        return folgaInicio === dayStr
+      }
+      
+      // Se tem dataFim, verificar se o dia está dentro do intervalo
+      const folgaFim = format(parseLocalDate(f.dataFim), 'yyyy-MM-dd')
+      return dayStr >= folgaInicio && dayStr <= folgaFim
     })
   }
 
@@ -909,7 +921,10 @@ export default function CronogramaPage() {
                   <div className="flex items-center gap-3">
                     <div className="text-right">
                       <p className="text-sm text-gray-900">
-                        {formatDate(f.data)}
+                        {f.dataFim 
+                          ? `${formatDate(f.dataInicio)} - ${formatDate(f.dataFim)}`
+                          : formatDate(f.dataInicio)
+                        }
                       </p>
                     </div>
                     <Button
@@ -1026,6 +1041,11 @@ export default function CronogramaPage() {
                           <p className="text-sm text-gray-500">
                             {f.departamento} • {TIPOS_FOLGA[f.tipo]?.label || f.tipo}
                           </p>
+                          {f.dataFim && (
+                            <p className="text-xs text-primary">
+                              {formatDate(f.dataInicio)} até {formatDate(f.dataFim)}
+                            </p>
+                          )}
                           {f.descricao && (
                             <p className="text-xs text-gray-400">{f.descricao}</p>
                           )}

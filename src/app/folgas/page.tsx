@@ -35,7 +35,8 @@ import {
 
 interface Folga {
   id: string
-  data: string
+  dataInicio: string
+  dataFim: string | null
   tipo: string
   descricao: string | null
   status: 'PENDENTE' | 'APROVADO' | 'REJEITADO'
@@ -363,7 +364,10 @@ export default function FolgasPage() {
                       <div className="flex items-center gap-4 mt-2 text-sm">
                         <div className="flex items-center gap-1 text-gray-600">
                           <Calendar className="w-4 h-4" />
-                          {formatDate(folga.data)}
+                          {folga.dataFim 
+                            ? `${formatDate(folga.dataInicio)} até ${formatDate(folga.dataFim)}`
+                            : formatDate(folga.dataInicio)
+                          }
                         </div>
                         {folga.descricao && (
                           <span className="text-gray-500">• {folga.descricao}</span>

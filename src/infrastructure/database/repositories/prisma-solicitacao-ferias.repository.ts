@@ -98,7 +98,7 @@ export class PrismaSolicitacaoFeriasRepository implements ISolicitacaoFeriasRepo
       },
       orderBy: { createdAt: 'desc' }
     })
-    return result as SolicitacaoFeriasCompleta[]
+    return result as unknown as SolicitacaoFeriasCompleta[]
   }
 
   async findPendentes(): Promise<SolicitacaoFeriasCompleta[]> {
@@ -161,7 +161,7 @@ export class PrismaSolicitacaoFeriasRepository implements ISolicitacaoFeriasRepo
     ])
 
     return {
-      data: data as SolicitacaoFeriasCompleta[],
+      data: data as unknown as SolicitacaoFeriasCompleta[],
       total,
       page,
       limit,
@@ -205,7 +205,7 @@ export class PrismaSolicitacaoFeriasRepository implements ISolicitacaoFeriasRepo
   }
 
   async findPorPeriodoData(dataInicio: Date, dataFim: Date): Promise<SolicitacaoFeriasCompleta[]> {
-    return this.prisma.solicitacaoFerias.findMany({
+    const result = await this.prisma.solicitacaoFerias.findMany({
       where: {
         dataInicioGozo: { lte: dataFim },
         dataFimGozo: { gte: dataInicio }
@@ -220,7 +220,8 @@ export class PrismaSolicitacaoFeriasRepository implements ISolicitacaoFeriasRepo
         }
       },
       orderBy: { dataInicioGozo: 'asc' }
-    }) as Promise<SolicitacaoFeriasCompleta[]>
+    })
+    return result as unknown as SolicitacaoFeriasCompleta[]
   }
 
   async findAprovadasNoPeriodo(dataInicio: Date, dataFim: Date): Promise<SolicitacaoFeriasCompleta[]> {
@@ -241,7 +242,7 @@ export class PrismaSolicitacaoFeriasRepository implements ISolicitacaoFeriasRepo
       },
       orderBy: { dataInicioGozo: 'asc' }
     })
-    return result as SolicitacaoFeriasCompleta[]
+    return result as unknown as SolicitacaoFeriasCompleta[]
   }
 
   async findProximasSaidas(limite: number): Promise<ProximaSaida[]> {
@@ -360,6 +361,6 @@ export class PrismaSolicitacaoFeriasRepository implements ISolicitacaoFeriasRepo
         }
       }
     })
-    return result as SolicitacaoFeriasCompleta[]
+    return result as unknown as SolicitacaoFeriasCompleta[]
   }
 }

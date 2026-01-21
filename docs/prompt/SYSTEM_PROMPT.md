@@ -9,7 +9,7 @@
 ```
 Você está trabalhando no projeto "CadêFulano?", um sistema de gestão de férias e ausências.
 
-**Stack**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Prisma, PostgreSQL, Docker.
+**Stack**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Prisma, MySQL, Docker.
 
 **Arquitetura em camadas**:
 - `src/app/api/` - API Routes (controllers)

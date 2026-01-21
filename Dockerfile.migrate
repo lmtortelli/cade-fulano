@@ -1,0 +1,22 @@
+# ============================================
+# Dockerfile para Migração do Banco de Dados
+# ============================================
+
+FROM node:20-alpine
+
+RUN apk add --no-cache libc6-compat openssl
+
+WORKDIR /app
+
+# Copiar arquivos de dependências
+COPY package.json package-lock.json* ./
+COPY prisma ./prisma
+
+# Instalar apenas dependências de produção
+RUN npm ci --only=production
+
+# Gerar Prisma Client
+RUN npx prisma generate
+
+# Comando de migração
+CMD ["sh", "-c", "echo 'Aguardando banco de dados...' && sleep 5 && echo 'Executando migração...' && npx prisma db push && echo 'Migração concluída!'"]

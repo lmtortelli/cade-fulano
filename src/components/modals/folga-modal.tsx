@@ -30,7 +30,8 @@ interface Colaborador {
 interface Folga {
   id: string
   colaboradorId: string
-  data: string
+  dataInicio: string
+  dataFim: string | null
   tipo: string
   descricao: string | null
 }
@@ -56,11 +57,13 @@ export function FolgaModal({ open, onClose, onSuccess, folga }: FolgaModalProps)
   const [loading, setLoading] = useState(false)
   const [formData, setFormData] = useState({
     colaboradorId: '',
-    data: '',
+    dataInicio: '',
+    dataFim: '',
     tipo: 'COMPENSACAO',
     descricao: ''
   })
   const [error, setError] = useState('')
+  const [usaIntervalo, setUsaIntervalo] = useState(false)
 
   const isEditing = !!folga
 
@@ -68,16 +71,21 @@ export function FolgaModal({ open, onClose, onSuccess, folga }: FolgaModalProps)
     if (open) {
       fetchColaboradores()
       if (folga) {
+        const temDataFim = !!folga.dataFim
+        setUsaIntervalo(temDataFim)
         setFormData({
           colaboradorId: folga.colaboradorId,
-          data: folga.data.split('T')[0],
+          dataInicio: folga.dataInicio.split('T')[0],
+          dataFim: folga.dataFim ? folga.dataFim.split('T')[0] : '',
           tipo: folga.tipo,
           descricao: folga.descricao || ''
         })
       } else {
+        setUsaIntervalo(false)
         setFormData({
           colaboradorId: '',
-          data: new Date().toISOString().split('T')[0],
+          dataInicio: new Date().toISOString().split('T')[0],
+          dataFim: '',
           tipo: 'COMPENSACAO',
           descricao: ''
         })
@@ -106,8 +114,18 @@ export function FolgaModal({ open, onClose, onSuccess, folga }: FolgaModalProps)
       return
     }
 
-    if (!formData.data) {
-      setError('Informe a data da folga')
+    if (!formData.dataInicio) {
+      setError('Informe a data de início da folga')
+      return
+    }
+
+    if (usaIntervalo && !formData.dataFim) {
+      setError('Informe a data de término da folga')
+      return
+    }
+
+    if (usaIntervalo && formData.dataFim && formData.dataFim < formData.dataInicio) {
+      setError('Data de término não pode ser anterior à data de início')
       return
     }
 
@@ -121,7 +139,8 @@ export function FolgaModal({ open, onClose, onSuccess, folga }: FolgaModalProps)
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           colaboradorId: formData.colaboradorId,
-          data: formData.data,
+          dataInicio: formData.dataInicio,
+          dataFim: usaIntervalo && formData.dataFim ? formData.dataFim : null,
           tipo: formData.tipo,
           descricao: formData.descricao || null
         })
@@ -175,17 +194,51 @@ export function FolgaModal({ open, onClose, onSuccess, folga }: FolgaModalProps)
             </Select>
           </div>
 
-          {/* Data */}
+          {/* Toggle intervalo */}
+          <div className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id="usaIntervalo"
+              checked={usaIntervalo}
+              onChange={(e) => {
+                setUsaIntervalo(e.target.checked)
+                if (!e.target.checked) {
+                  setFormData({ ...formData, dataFim: '' })
+                }
+              }}
+              className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <Label htmlFor="usaIntervalo" className="cursor-pointer text-sm font-normal">
+              Período com múltiplos dias (ex: licença)
+            </Label>
+          </div>
+
+          {/* Data Início */}
           <div>
-            <Label htmlFor="data">Data *</Label>
+            <Label htmlFor="dataInicio">{usaIntervalo ? 'Data de Início *' : 'Data *'}</Label>
             <Input
-              id="data"
+              id="dataInicio"
               type="date"
-              value={formData.data}
-              onChange={(e) => setFormData({ ...formData, data: e.target.value })}
+              value={formData.dataInicio}
+              onChange={(e) => setFormData({ ...formData, dataInicio: e.target.value })}
               className="mt-1.5"
             />
           </div>
+
+          {/* Data Fim (se usar intervalo) */}
+          {usaIntervalo && (
+            <div>
+              <Label htmlFor="dataFim">Data de Término *</Label>
+              <Input
+                id="dataFim"
+                type="date"
+                value={formData.dataFim}
+                onChange={(e) => setFormData({ ...formData, dataFim: e.target.value })}
+                min={formData.dataInicio}
+                className="mt-1.5"
+              />
+            </div>
+          )}
 
           {/* Tipo */}
           <div>

@@ -46,14 +46,30 @@ export async function POST(request: NextRequest) {
     const folgaService = container.getFolgaService()
     const body = await request.json()
 
-    // Adicionar horário ao meio-dia para evitar problemas de timezone
-    const dataStr = typeof body.data === 'string' && body.data.length === 10 
-      ? body.data + 'T12:00:00' 
-      : body.data
+    // Função helper para converter data com horário ao meio-dia
+    const parseDate = (dateStr: string | undefined): Date | undefined => {
+      if (!dateStr) return undefined
+      const str = typeof dateStr === 'string' && dateStr.length === 10 
+        ? dateStr + 'T12:00:00' 
+        : dateStr
+      return new Date(str)
+    }
+
+    // Suporte a data única (retrocompatibilidade) ou intervalo
+    const dataInicio = parseDate(body.dataInicio || body.data)
+    const dataFim = body.dataFim ? parseDate(body.dataFim) : null
+
+    if (!dataInicio) {
+      return NextResponse.json(
+        { error: 'Data de início é obrigatória' },
+        { status: 400 }
+      )
+    }
 
     const folga = await folgaService.criar({
       colaboradorId: body.colaboradorId,
-      data: new Date(dataStr),
+      dataInicio,
+      dataFim,
       tipo: body.tipo,
       descricao: body.descricao,
       status: body.status // PENDENTE para solicitações, APROVADO para criação direta

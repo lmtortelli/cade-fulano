@@ -3,24 +3,24 @@
 # Hot reload habilitado
 # ============================================
 
-version: '3.8'
-
 services:
-  # Banco de Dados PostgreSQL
-  postgres:
-    image: postgres:16-alpine
+  # Banco de Dados MySQL
+  mysql:
+    image: mysql:8.0
     container_name: feriaspro-db-dev
     restart: unless-stopped
     environment:
-      POSTGRES_USER: ferias
-      POSTGRES_PASSWORD: ferias123
-      POSTGRES_DB: feriaspro
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_USER: ferias
+      MYSQL_PASSWORD: ferias123
+      MYSQL_DATABASE: feriaspro
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data_dev:/var/lib/postgresql/data
+      - mysql_data_dev:/var/lib/mysql
+    command: --default-authentication-plugin=mysql_native_password --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ferias -d feriaspro"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot123"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,13 +33,13 @@ services:
     container_name: feriaspro-app-dev
     restart: unless-stopped
     environment:
-      DATABASE_URL: postgresql://ferias:ferias123@postgres:5432/feriaspro?schema=public
+      DATABASE_URL: mysql://ferias:ferias123@mysql:3306/feriaspro
       NEXT_PUBLIC_APP_URL: http://localhost:3000
       NODE_ENV: development
     ports:
       - "3000:3000"
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     volumes:
       # Montar código para hot reload
@@ -52,22 +52,24 @@ services:
     stdin_open: true
     tty: true
     
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    container_name: feriaspro-pgadmin
+  # phpMyAdmin para administração do banco (opcional)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: feriaspro-phpmyadmin
     restart: unless-stopped
     environment:
-      PGADMIN_DEFAULT_EMAIL: admin@feriaspro.com
-      PGADMIN_DEFAULT_PASSWORD: admin123
+      PMA_HOST: mysql
+      PMA_USER: root
+      PMA_PASSWORD: root123
     ports:
-      - "5050:80"
+      - "8080:80"
     depends_on:
-      - postgres
+      - mysql
     profiles:
       - tools
 
 volumes:
-  postgres_data_dev:
+  mysql_data_dev:
 
 networks:
   default:

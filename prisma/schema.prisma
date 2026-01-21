@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -114,13 +114,14 @@ model SolicitacaoFerias {
 
 // ============================================
 // FOLGA
-// Registro de folgas (feriados, compensações, etc)
+// Registro de folgas (feriados, compensações, licenças, etc)
 // ============================================
 model Folga {
   id            String         @id @default(cuid())
   colaboradorId String
   colaborador   Colaborador    @relation(fields: [colaboradorId], references: [id], onDelete: Cascade)
-  data          DateTime
+  dataInicio    DateTime       // Data de início da folga
+  dataFim       DateTime?      // Data de fim (opcional para folgas de 1 dia)
   tipo          TipoFolga
   descricao     String?
   status        StatusFolga    @default(APROVADO)
@@ -129,7 +130,8 @@ model Folga {
   updatedAt     DateTime       @updatedAt
 
   @@index([colaboradorId])
-  @@index([data])
+  @@index([dataInicio])
+  @@index([dataFim])
   @@index([status])
   @@map("folgas")
 }

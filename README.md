@@ -1,8 +1,6 @@
-# 📅 FériasPro - Sistema de Gestão de Férias
+# 🔍 CadêFulano? - Sistema de Gestão de Férias e Ausências
 
-Sistema completo para gerenciamento de férias de colaboradores, desenvolvido com Next.js e preparado para escalar.
-
-![FériasPro Dashboard](docs/images/dashboard-preview.png)
+Sistema completo para gerenciamento de férias e ausências de colaboradores, desenvolvido com Next.js e preparado para escalar.
 
 ## ✨ Funcionalidades
 
@@ -11,8 +9,10 @@ Sistema completo para gerenciamento de férias de colaboradores, desenvolvido co
 - 💰 **Venda de Férias** - Suporte a abono pecuniário (até 10 dias)
 - ✅ **Workflow de Aprovação** - Solicitação → Aprovação → Gozo
 - 📊 **Dashboard** - Métricas em tempo real
-- 🗓️ **Cronograma** - Visualização mensal de férias
+- 🗓️ **Cronograma** - Visualização mensal de férias e folgas
+- 📋 **Folgas** - Gestão de folgas com múltiplos tipos
 - ⚠️ **Alertas** - Detecção de conflitos e vencimentos
+- 📅 **Google Calendar** - Exportação de eventos
 
 ## 🛠️ Stack Tecnológica
 
@@ -22,7 +22,7 @@ Sistema completo para gerenciamento de férias de colaboradores, desenvolvido co
 | Estilização | Tailwind CSS |
 | Componentes | shadcn/ui + Radix UI |
 | Backend | Next.js API Routes |
-| Banco de Dados | PostgreSQL |
+| Banco de Dados | MySQL 8.0 |
 | ORM | Prisma |
 | Container | Docker + Docker Compose |
 
@@ -94,12 +94,12 @@ docker-compose exec app npm run db:seed
 # Instale as dependências
 npm install
 
-# Inicie apenas o PostgreSQL
-docker-compose up -d postgres
+# Inicie apenas o MySQL
+docker-compose up -d mysql
 
 # Configure o banco de dados
 cp .env.example .env
-npx prisma migrate dev
+npx prisma db push
 npm run db:seed
 
 # Inicie o servidor de desenvolvimento
@@ -136,8 +136,8 @@ npm run docker:logs  # Visualiza logs
 Crie um arquivo `.env` baseado no `.env.example`:
 
 ```env
-# Banco de Dados
-DATABASE_URL="postgresql://ferias:ferias123@localhost:5432/feriaspro?schema=public"
+# Banco de Dados MySQL
+DATABASE_URL="mysql://ferias:ferias123@localhost:3306/feriaspro"
 
 # Aplicação
 NEXT_PUBLIC_APP_URL="http://localhost:3000"

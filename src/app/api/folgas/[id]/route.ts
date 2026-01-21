@@ -36,17 +36,24 @@ export async function PUT(
     const folgaService = container.getFolgaService()
     const body = await request.json()
 
-    // Adicionar horário ao meio-dia para evitar problemas de timezone
-    let dataConvertida: Date | undefined = undefined
-    if (body.data) {
-      const dataStr = typeof body.data === 'string' && body.data.length === 10 
-        ? body.data + 'T12:00:00' 
-        : body.data
-      dataConvertida = new Date(dataStr)
+    // Função helper para converter data com horário ao meio-dia
+    const parseDate = (dateStr: string | undefined): Date | undefined => {
+      if (!dateStr) return undefined
+      const str = typeof dateStr === 'string' && dateStr.length === 10 
+        ? dateStr + 'T12:00:00' 
+        : dateStr
+      return new Date(str)
     }
 
+    // Suporte a data única (retrocompatibilidade) ou intervalo
+    const dataInicio = parseDate(body.dataInicio || body.data)
+    const dataFim = body.dataFim !== undefined 
+      ? (body.dataFim ? parseDate(body.dataFim) : null)
+      : undefined
+
     const folga = await folgaService.atualizar(params.id, {
-      data: dataConvertida,
+      dataInicio,
+      dataFim,
       tipo: body.tipo,
       descricao: body.descricao
     })

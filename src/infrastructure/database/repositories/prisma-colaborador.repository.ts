@@ -103,9 +103,9 @@ export class PrismaColaboradorRepository implements IColaboradorRepository {
 
     if (filtros.busca) {
       where.OR = [
-        { nome: { contains: filtros.busca, mode: 'insensitive' } },
-        { email: { contains: filtros.busca, mode: 'insensitive' } },
-        { matricula: { contains: filtros.busca, mode: 'insensitive' } }
+        { nome: { contains: filtros.busca } },
+        { email: { contains: filtros.busca } },
+        { matricula: { contains: filtros.busca } }
       ]
     }
 
@@ -146,19 +146,20 @@ export class PrismaColaboradorRepository implements IColaboradorRepository {
   }
 
   async buscar(termo: string): Promise<ColaboradorComDepartamento[]> {
-    return this.prisma.colaborador.findMany({
+    const result = await this.prisma.colaborador.findMany({
       where: {
         OR: [
-          { nome: { contains: termo, mode: 'insensitive' } },
-          { email: { contains: termo, mode: 'insensitive' } },
-          { matricula: { contains: termo, mode: 'insensitive' } },
-          { cargo: { contains: termo, mode: 'insensitive' } }
+          { nome: { contains: termo } },
+          { email: { contains: termo } },
+          { matricula: { contains: termo } },
+          { cargo: { contains: termo } }
         ]
       },
       include: { departamento: true },
       orderBy: { nome: 'asc' },
       take: 20
     })
+    return result as ColaboradorComDepartamento[]
   }
 
   async count(): Promise<number> {

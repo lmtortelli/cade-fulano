@@ -19,9 +19,11 @@ import {
   CheckCircle,
   EyeOff,
   Eye,
-  DollarSign
+  DollarSign,
+  FileText,
+  Pencil
 } from 'lucide-react'
-import { FeriasModal, CancelamentoModal } from '@/components/modals'
+import { FeriasModal, CancelamentoModal, ObservacoesPeriodoModal } from '@/components/modals'
 
 interface Periodo {
   id: string
@@ -33,6 +35,7 @@ interface Periodo {
   diasVendidos: number
   status: 'ATIVO' | 'QUITADO' | 'VENCIDO'
   ignorado: boolean
+  observacoes: string | null
   solicitacoes: Array<{
     id: string
     dataInicioGozo: string
@@ -78,6 +81,13 @@ export default function ColaboradorDetalhePage() {
     tipo: 'GOZO' | 'ABONO_PECUNIARIO' | null
     dias: number
   }>({ open: false, solicitacaoId: null, tipo: null, dias: 0 })
+
+  const [observacoesModal, setObservacoesModal] = useState<{
+    open: boolean
+    periodoId: string
+    numeroPeriodo: number
+    observacoes: string | null
+  }>({ open: false, periodoId: '', numeroPeriodo: 0, observacoes: null })
 
   useEffect(() => {
     if (params.id) {
@@ -322,6 +332,12 @@ export default function ColaboradorDetalhePage() {
                 onAgendar={() => handleAgendarFerias(periodo.id)}
                 onIgnorar={(ignorar) => handleIgnorarPeriodo(periodo.id, ignorar)}
                 onCancelar={handleCancelarSolicitacao}
+                onEditarObservacoes={() => setObservacoesModal({
+                  open: true,
+                  periodoId: periodo.id,
+                  numeroPeriodo: periodo.numeroPeriodo,
+                  observacoes: periodo.observacoes
+                })}
                 isIgnorando={ignorandoPeriodo === periodo.id}
               />
             ))}
@@ -353,6 +369,16 @@ export default function ColaboradorDetalhePage() {
         title={cancelamentoModal.tipo === 'GOZO' ? 'Cancelar Férias' : 'Cancelar Venda de Dias'}
         description={`Cancelar ${cancelamentoModal.tipo === 'GOZO' ? 'férias' : 'venda'} de ${cancelamentoModal.dias} dias?`}
       />
+
+      {/* Modal de Observações */}
+      <ObservacoesPeriodoModal
+        open={observacoesModal.open}
+        onClose={() => setObservacoesModal({ open: false, periodoId: '', numeroPeriodo: 0, observacoes: null })}
+        onSuccess={() => fetchColaborador(params.id as string)}
+        periodoId={observacoesModal.periodoId}
+        numeroPeriodo={observacoesModal.numeroPeriodo}
+        observacoesAtuais={observacoesModal.observacoes}
+      />
     </div>
   )
 }
@@ -362,10 +388,11 @@ interface PeriodoCardProps {
   onAgendar: () => void
   onIgnorar: (ignorar: boolean) => void
   onCancelar: (solicitacaoId: string, tipo: 'GOZO' | 'ABONO_PECUNIARIO', dias: number) => void
+  onEditarObservacoes: () => void
   isIgnorando: boolean
 }
 
-function PeriodoCard({ periodo, onAgendar, onIgnorar, onCancelar, isIgnorando }: PeriodoCardProps) {
+function PeriodoCard({ periodo, onAgendar, onIgnorar, onCancelar, onEditarObservacoes, isIgnorando }: PeriodoCardProps) {
   // Calcular dias gozados (férias aprovadas)
   const diasGozados = periodo.solicitacoes
     .filter(s => s.status === 'APROVADO' && s.tipo === 'GOZO')
@@ -516,6 +543,34 @@ function PeriodoCard({ periodo, onAgendar, onIgnorar, onCancelar, isIgnorando }:
           <p className="text-gray-500">Pendentes</p>
           <p className="font-semibold text-gray-900">{diasPendentes} dias</p>
         </div>
+      </div>
+
+      {/* Observações */}
+      <div className="mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-sm font-medium text-gray-700 flex items-center gap-1">
+            <FileText className="w-4 h-4" />
+            Observações
+          </p>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={onEditarObservacoes}
+            className="text-gray-500 hover:text-primary h-7 px-2"
+          >
+            <Pencil className="w-3 h-3 mr-1" />
+            {periodo.observacoes ? 'Editar' : 'Adicionar'}
+          </Button>
+        </div>
+        {periodo.observacoes ? (
+          <div className="bg-amber-50 border border-amber-100 rounded-lg p-3 text-sm text-amber-900">
+            {periodo.observacoes}
+          </div>
+        ) : (
+          <p className="text-sm text-gray-400 italic">
+            Nenhuma observação registrada para este período.
+          </p>
+        )}
       </div>
 
       {/* Solicitações */}

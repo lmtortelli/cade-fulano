@@ -53,8 +53,11 @@ export async function PUT(request: NextRequest, { params }: Params) {
 
 export async function DELETE(request: NextRequest, { params }: Params) {
   try {
+    const body = await request.json().catch(() => ({}))
+    const motivoCancelamento = body.motivoCancelamento || 'Cancelado via API'
+    
     const solicitacaoService = container.getSolicitacaoFeriasService()
-    await solicitacaoService.cancelar(params.id)
+    await solicitacaoService.cancelar(params.id, motivoCancelamento)
 
     return NextResponse.json({ message: 'Solicitação cancelada com sucesso' })
   } catch (error: any) {

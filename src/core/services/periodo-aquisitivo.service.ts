@@ -100,7 +100,8 @@ export class PeriodoAquisitivoService {
       percentualUsado,
       status: periodo.status,
       diasParaVencer,
-      estaVencendo
+      estaVencendo,
+      ignorado: periodo.ignorado
     }
   }
 

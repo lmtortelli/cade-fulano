@@ -54,14 +54,19 @@ export class FolgaService {
       throw new Error('Não é possível registrar folga para colaborador inativo')
     }
 
-    // Validar data
-    if (!dados.data) {
-      throw new Error('Data da folga é obrigatória')
+    // Validar data de início
+    if (!dados.dataInicio) {
+      throw new Error('Data de início da folga é obrigatória')
     }
 
     // Validar tipo
     if (!dados.tipo) {
       throw new Error('Tipo da folga é obrigatório')
+    }
+
+    // Validar que dataFim não é antes de dataInicio
+    if (dados.dataFim && dados.dataFim < dados.dataInicio) {
+      throw new Error('Data de fim não pode ser anterior à data de início')
     }
 
     return this.folgaRepo.create(dados)

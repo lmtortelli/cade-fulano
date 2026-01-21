@@ -80,6 +80,7 @@ export interface PeriodoAquisitivo {
   diasDireito: number
   diasVendidos: number
   status: StatusPeriodo
+  ignorado: boolean
   observacoes: string | null
   createdAt: Date
   updatedAt: Date
@@ -124,7 +125,8 @@ export enum StatusFolga {
 export interface Folga {
   id: string
   colaboradorId: string
-  data: Date
+  dataInicio: Date
+  dataFim: Date | null  // null para folgas de 1 dia
   tipo: TipoFolga
   descricao: string | null
   status: StatusFolga
@@ -225,14 +227,16 @@ export interface CancelarSolicitacaoDTO {
 // Folga
 export interface CreateFolgaDTO {
   colaboradorId: string
-  data: Date
+  dataInicio: Date
+  dataFim?: Date | null  // opcional para folgas de 1 dia
   tipo: TipoFolga
   descricao?: string
   status?: StatusFolga
 }
 
 export interface UpdateFolgaDTO {
-  data?: Date
+  dataInicio?: Date
+  dataFim?: Date | null
   tipo?: TipoFolga
   descricao?: string
 }

@@ -43,7 +43,9 @@ export default function SolicitarFolgaPage() {
   
   // Form fields
   const [colaboradorId, setColaboradorId] = useState('')
-  const [data, setData] = useState('')
+  const [dataInicio, setDataInicio] = useState('')
+  const [dataFim, setDataFim] = useState('')
+  const [usaIntervalo, setUsaIntervalo] = useState(false)
   const [tipo, setTipo] = useState('')
   const [descricao, setDescricao] = useState('')
 
@@ -68,8 +70,20 @@ export default function SolicitarFolgaPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
-    if (!colaboradorId || !data || !tipo) {
+    if (!colaboradorId || !dataInicio || !tipo) {
       setErrorMessage('Por favor, preencha todos os campos obrigatórios.')
+      setFormStatus('error')
+      return
+    }
+
+    if (usaIntervalo && !dataFim) {
+      setErrorMessage('Por favor, informe a data de término.')
+      setFormStatus('error')
+      return
+    }
+
+    if (usaIntervalo && dataFim && dataFim < dataInicio) {
+      setErrorMessage('Data de término não pode ser anterior à data de início.')
       setFormStatus('error')
       return
     }
@@ -83,7 +97,8 @@ export default function SolicitarFolgaPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           colaboradorId,
-          data,
+          dataInicio,
+          dataFim: usaIntervalo && dataFim ? dataFim : null,
           tipo,
           descricao: descricao || undefined,
           status: 'PENDENTE', // Sempre vai como pendente para aprovação
@@ -98,7 +113,9 @@ export default function SolicitarFolgaPage() {
       setFormStatus('success')
       // Limpar formulário
       setColaboradorId('')
-      setData('')
+      setDataInicio('')
+      setDataFim('')
+      setUsaIntervalo(false)
       setTipo('')
       setDescricao('')
     } catch (err) {
@@ -171,18 +188,53 @@ export default function SolicitarFolgaPage() {
               </Select>
             </div>
 
-            {/* Data */}
+            {/* Toggle intervalo */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="usaIntervalo"
+                checked={usaIntervalo}
+                onChange={(e) => {
+                  setUsaIntervalo(e.target.checked)
+                  if (!e.target.checked) {
+                    setDataFim('')
+                  }
+                }}
+                className="h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <Label htmlFor="usaIntervalo" className="cursor-pointer text-sm font-normal">
+                Período com múltiplos dias (ex: licença)
+              </Label>
+            </div>
+
+            {/* Data Início */}
             <div className="space-y-2">
-              <Label htmlFor="data">
-                Data da Folga <span className="text-red-500">*</span>
+              <Label htmlFor="dataInicio">
+                {usaIntervalo ? 'Data de Início' : 'Data da Folga'} <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="data"
+                id="dataInicio"
                 type="date"
-                value={data}
-                onChange={(e) => setData(e.target.value)}
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
               />
             </div>
+
+            {/* Data Fim (se usar intervalo) */}
+            {usaIntervalo && (
+              <div className="space-y-2">
+                <Label htmlFor="dataFim">
+                  Data de Término <span className="text-red-500">*</span>
+                </Label>
+                <Input
+                  id="dataFim"
+                  type="date"
+                  value={dataFim}
+                  onChange={(e) => setDataFim(e.target.value)}
+                  min={dataInicio}
+                />
+              </div>
+            )}
 
             {/* Tipo */}
             <div className="space-y-2">

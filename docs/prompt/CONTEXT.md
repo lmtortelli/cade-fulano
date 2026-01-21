@@ -14,7 +14,7 @@
 | Estilização | Tailwind CSS, shadcn/ui |
 | Backend | Next.js API Routes |
 | ORM | Prisma |
-| Banco de Dados | PostgreSQL (prod), SQLite (dev local) |
+| Banco de Dados | MySQL 8.0 |
 | Containerização | Docker, Docker Compose |
 
 ## 📁 Estrutura do Projeto
