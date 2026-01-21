@@ -124,7 +124,7 @@ END:VEVENT`).join('\n')
 
   return `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//CadeFulano//Cronograma//PT
+PRODID:-//Offy//Cronograma//PT
 CALSCALE:GREGORIAN
 METHOD:PUBLISH
 ${icsEvents}

@@ -121,7 +121,7 @@ export default function DashboardPage() {
             <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg">
               <span className="text-3xl">🔍</span>
             </div>
-            <CardTitle className="text-2xl">Bem-vindo ao CadêFulano?</CardTitle>
+            <CardTitle className="text-2xl">Bem-vindo ao Offy</CardTitle>
           </CardHeader>
           <CardContent className="text-center space-y-6">
             <p className="text-gray-600">

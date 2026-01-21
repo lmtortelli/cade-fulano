@@ -1,4 +1,4 @@
-# 🔍 CadêFulano? - Sistema de Gestão de Férias e Ausências
+# 🗓️ Offy - Sistema de Gestão de Férias e Ausências
 
 Sistema completo para gerenciamento de férias e ausências de colaboradores, desenvolvido com Next.js e preparado para escalar.
 

@@ -1,12 +1,12 @@
 # 📋 Product Requirements Document (PRD)
 
-Este diretório contém a documentação de requisitos do produto **CadêFulano?** e um template para novos projetos.
+Este diretório contém a documentação de requisitos do produto **Offy** e um template para novos projetos.
 
 ## 📁 Arquivos
 
 | Arquivo | Descrição |
 |---------|-----------|
-| `PRD.md` | PRD completo do CadêFulano? com todos os requisitos implementados |
+| `PRD.md` | PRD completo do Offy com todos os requisitos implementados |
 | `TEMPLATE_PRD.md` | Template genérico para criar PRDs de novos projetos |
 
 ## 🎯 Como Usar o Template

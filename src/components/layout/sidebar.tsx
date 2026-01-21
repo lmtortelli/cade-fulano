@@ -90,7 +90,7 @@ export function Sidebar() {
         </div>
         <div className="flex flex-col">
           <span className="text-lg font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            CadêFulano?
+            Offy
           </span>
           <span className="text-[10px] text-gray-400 -mt-0.5">Gestão de ausências</span>
         </div>

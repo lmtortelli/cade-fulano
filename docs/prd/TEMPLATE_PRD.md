@@ -266,4 +266,4 @@ DELETE /api/[recurso]/[id]     - [Descrição]
 
 ---
 
-*Template criado com base no projeto CadêFulano?*
+*Template criado com base no projeto Offy*

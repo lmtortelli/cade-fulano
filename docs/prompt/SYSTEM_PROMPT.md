@@ -1,4 +1,4 @@
-# System Prompt - CadêFulano?
+# System Prompt - Offy
 
 > Use este prompt no início de novos chats para carregar o contexto do projeto.
 
@@ -7,7 +7,7 @@
 ## Prompt para Copiar:
 
 ```
-Você está trabalhando no projeto "CadêFulano?", um sistema de gestão de férias e ausências.
+Você está trabalhando no projeto "Offy", um sistema de gestão de férias e ausências.
 
 **Stack**: Next.js 14 (App Router), TypeScript, Tailwind CSS, Prisma, MySQL, Docker.
 

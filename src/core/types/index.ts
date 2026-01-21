@@ -1,5 +1,5 @@
 // ============================================
-// TIPOS COMPARTILHADOS - CadêFulano?
+// TIPOS COMPARTILHADOS - Offy
 // Preparado para migração para backend separado
 // ============================================
 

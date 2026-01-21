@@ -1,10 +1,10 @@
-# CadêFulano? - Contexto do Projeto
+# Offy - Contexto do Projeto
 
 > **Documento de contexto para carregar em chats futuros com IA**
 
 ## 📋 Visão Geral
 
-**CadêFulano?** é um sistema de gerenciamento de férias e ausências para empresas com 26-50 colaboradores. Permite cadastrar colaboradores, gerenciar períodos aquisitivos de férias, agendar férias, vender dias (abono pecuniário), registrar folgas e visualizar tudo em um cronograma.
+**Offy** é um sistema de gerenciamento de férias e ausências para empresas com 26-50 colaboradores. Permite cadastrar colaboradores, gerenciar períodos aquisitivos de férias, agendar férias, vender dias (abono pecuniário), registrar folgas e visualizar tudo em um cronograma.
 
 ## 🛠️ Stack Tecnológica
 
@@ -251,7 +251,7 @@ docker-compose up -d --build
 
 ## 🎨 Identidade Visual
 
-- **Nome**: CadêFulano?
+- **Nome**: Offy
 - **Ícone**: 🔍
 - **Cores**: Gradiente azul (#3B82F6) → roxo (#9333EA)
 - **Fonte**: Inter

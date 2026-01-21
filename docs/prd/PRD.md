@@ -1,5 +1,5 @@
 # Product Requirements Document (PRD)
-## CadêFulano? - Sistema de Gestão de Férias e Ausências
+## Offy - Sistema de Gestão de Férias e Ausências
 
 **Versão:** 1.0  
 **Data:** Janeiro 2026  
@@ -10,7 +10,7 @@
 ## 1. Visão Geral do Produto
 
 ### 1.1 Objetivo
-CadêFulano? é um sistema web para gerenciamento de férias e ausências de colaboradores em empresas de pequeno/médio porte (26-50 funcionários). O sistema permite controle completo do ciclo de férias, desde o período aquisitivo até a aprovação e histórico.
+Offy é um sistema web para gerenciamento de férias e ausências de colaboradores em empresas de pequeno/médio porte (26-50 funcionários). O sistema permite controle completo do ciclo de férias, desde o período aquisitivo até a aprovação e histórico.
 
 ### 1.2 Problema a Resolver
 - Dificuldade em acompanhar múltiplos períodos aquisitivos de férias

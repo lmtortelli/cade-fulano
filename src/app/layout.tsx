@@ -9,7 +9,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'CadêFulano? - Gestão de Férias e Ausências',
+  title: 'Offy - Gestão de Férias e Ausências',
   description: 'Sistema de gerenciamento de férias e ausências para empresas',
 }
 
